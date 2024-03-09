@@ -54,7 +54,7 @@ class Consuemer:
         try:
             req_body = json.loads(body)
 
-            inputs = {"text_prompt": req_body.get("text_prompt", None), 
+            inputs = {"class_names": req_body.get("class_names", None), 
                                             "box_threshold": req_body.get("box_threshold", None), 
                                             "text_threshold": req_body.get("text_threshold", None), 
                                             "image_path": req_body.get("image_path", None)}
