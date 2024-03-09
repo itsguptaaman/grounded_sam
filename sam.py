@@ -85,7 +85,7 @@ class ObjectDetector:
             result_masks.append(masks[index])
         return np.array(result_masks)
 
-    def process_image(self):
+    def process_image(self, retry=2):
         try:
             self.load_image()
             self.detect_objects()
@@ -103,7 +103,15 @@ class ObjectDetector:
             # Clear CUDA memory
             torch.cuda.empty_cache()
             print("CUDA memory cleared. Retrying...")
-    
+            if retry != 0:
+                self.process_image(self, retry=retry-1)
+
+            else:
+                print("Try Again later!")
+        
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
 
 
 
