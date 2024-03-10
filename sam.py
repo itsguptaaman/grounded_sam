@@ -31,11 +31,7 @@ mask_annotator = sv.MaskAnnotator()
 
 
 class ObjectDetector:
-    def __init__(self, source_image_path: str, classes: List[str], box_threshold: float, text_threshold: float):
-        self.source_image_path = source_image_path
-        self.classes = classes
-        self.box_threshold = box_threshold
-        self.text_threshold = text_threshold
+    def __init__(self):
         self.image = None
         self.detections = None
 
@@ -85,18 +81,27 @@ class ObjectDetector:
             result_masks.append(masks[index])
         return np.array(result_masks)
 
-    def process_image(self, retry=2):
+    def process_image(self, source_image_path: str, classes: List[str], box_threshold: float, text_threshold: float, retry=2):
         try:
+            self.source_image_path = source_image_path
+            self.classes = classes
+            self.box_threshold = box_threshold
+            self.text_threshold = text_threshold
+
             self.load_image()
             self.detect_objects()
+            
             self.detections.mask = self.segment(
                 sam_predictor=sam_predictor,
                 image=cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB),
                 xyxy=self.detections.xyxy
             )
+            
             labels = self.get_labels()
+            
             annotated_image = mask_annotator.annotate(scene=self.image.copy(), detections=self.detections)
             annotated_image = box_annotator.annotate(scene=annotated_image, detections=self.detections, labels=labels)
+            
             return annotated_image
         
         except torch.cuda.OutOfMemoryError:
@@ -117,23 +122,24 @@ class ObjectDetector:
 
 if __name__ == "__main__":
     # Usage
-    SOURCE_IMAGE_PATH = "C:/Users/Aman/Downloads/sam/resized_image.jpg"
+    SOURCE_IMAGE_PATH = "C:/Users/Aman/Downloads/sam/input_images/f5df2cd0de2b6182fb5de9dac073dde0.jpg"
     CLASSES = ['persons']
     BOX_THRESHOLD = 0.35
     TEXT_THRESHOLD = 0.25
 
-    obj_detector = ObjectDetector(
+    obj_detector = ObjectDetector()
+
+    annotated_image = obj_detector.process_image(
         source_image_path=SOURCE_IMAGE_PATH,
         classes=CLASSES,
         box_threshold=BOX_THRESHOLD,
         text_threshold=TEXT_THRESHOLD
     )
-
-    annotated_image = obj_detector.process_image()
+    
     bgr_image = Image.fromarray(np.array(annotated_image)[:, :, ::-1])
     # Save the annotated image
     
     ext = SOURCE_IMAGE_PATH.split(".")[-1]
-    output_path = os.path.join(os.path.join(ROOT_PATH, "images"), f"output.{ext}")
+    output_path = os.path.join(os.path.join(ROOT_PATH, "output_images"), f"output.{ext}")
     bgr_image.save(output_path)
     print(output_path)
