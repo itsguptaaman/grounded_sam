@@ -70,11 +70,10 @@ def main():
                     img_path = save_uploaded_image(file, IMAGES_PATH)
                     resize_image(img_path, target_size=(1280, 720))
                     doc = None
-                    task = {"class_names": list(classes), "box_threshold": box_threshold, 
+                    task = {"class_names": [classes], "box_threshold": box_threshold, 
                             "text_threshold": text_threshold, "image_path": img_path}
                     
                     md5 = get_md5(task)
-                    print(md5)
                     producer.enqueue_task(task)
                     start_time = time.time()
                     
@@ -82,7 +81,7 @@ def main():
                         doc = producer.find_document_by_md5(md5)
                         if doc:
                             break
-                        time.sleep(10)
+                        time.sleep(4)
 
                     if doc:
                         output_path = doc.get("output_path", None)
