@@ -46,7 +46,7 @@ def get_md5(data):
 
 # Create a Streamlit page
 def main():
-    st.title('Zero Shot Object Detection!')
+    st.title('Zero Shot Instance Segmentation!')
     st.write('Please upload an image')
     
     # Create a file uploader
@@ -54,7 +54,8 @@ def main():
 
     # Input field for TEXT_PROMPT
     classes = st.text_input("Mention the classes you want to predict!", "").lower()
-    
+    classes = classes.split(" ")
+    print(classes)
     # Input field for BOX_THRESHOLD
     box_threshold = st.slider("Box Threshold", min_value=0.0, max_value=1.0, value=0.35, step=0.01)
     
@@ -70,7 +71,7 @@ def main():
                     img_path = save_uploaded_image(file, IMAGES_PATH)
                     resize_image(img_path, target_size=(1280, 720))
                     doc = None
-                    task = {"class_names": [classes], "box_threshold": box_threshold, 
+                    task = {"class_names": classes, "box_threshold": box_threshold, 
                             "text_threshold": text_threshold, "image_path": img_path}
                     
                     md5 = get_md5(task)
@@ -85,9 +86,9 @@ def main():
 
                     if doc:
                         output_path = doc.get("output_path", None)
-                        
+                        print(output_path)    
                         image = Image.open(output_path)
-                        
+                    
                         # Display the uploaded image
                         st.image(image, caption='Output', use_column_width=True)
                     
