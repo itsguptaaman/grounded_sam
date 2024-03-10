@@ -60,6 +60,7 @@ class Consuemer:
                                             "image_path": req_body.get("image_path", None)}
             print(inputs)
             md5 = self.calculate_md5(inputs)
+            req_body["md5"] = md5
             result = self.function(req_body)
             final_dt = {"md5": md5, "inputs": inputs, "output_path": result}
 
