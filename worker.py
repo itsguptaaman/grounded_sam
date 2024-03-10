@@ -11,6 +11,7 @@ from .consumer import Consuemer
 from . import *
 
 
+obj_detector = sam.ObjectDetector()
 
 
 def sam_wrapper(data):
@@ -21,14 +22,13 @@ def sam_wrapper(data):
         image_path = data.get("image_path", None)
         output = data.get("md5", "output")
 
-        obj_detector = sam.ObjectDetector(
+        annotated_image = obj_detector.process_image(
             source_image_path=image_path,
             classes=class_names,
             box_threshold=box_threshold,
             text_threshold=text_threshold
-        )
-
-        annotated_image = obj_detector.process_image()
+            )
+        
         bgr_image = Image.fromarray(np.array(annotated_image)[:, :, ::-1])
         # Save the annotated image
 
